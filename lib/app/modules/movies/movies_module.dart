@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/page/movies_page.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/screen/movies_page.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
 
 class MoviesModule extends Module {

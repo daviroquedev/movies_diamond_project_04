@@ -2,22 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/view/components/row_cards.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/drawer_islogged.dart';
+
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 class MoviesScreen extends StatefulWidget {
+  const MoviesScreen({super.key});
+
   @override
-  _MoviesScreenState createState() => _MoviesScreenState();
+  MoviesScreenState createState() => MoviesScreenState();
 }
 
-class _MoviesScreenState extends State<MoviesScreen> {
+class MoviesScreenState extends State<MoviesScreen> {
   final MoviesService _moviesService = Modular.get();
-  late List<MoviesModels> _movies =
-      []; // Alteração: Usar a classe Movie em vez de dynamic
+  late List<MoviesModels> _movies = [];
+  late List<MoviesModels> _randomMovies = [];
+  late List<MoviesModels> _oldMovies = [];
 
   @override
   void initState() {
     super.initState();
     fetchMovies();
+    fetchRandomMovies();
+    fetchOldMovies();
   }
 
   Future<void> fetchMovies() async {
@@ -33,69 +40,112 @@ class _MoviesScreenState extends State<MoviesScreen> {
     }
   }
 
+  Future<void> fetchRandomMovies() async {
+    try {
+      final randomMovies = await _moviesService.fetchRandomMovies();
+      setState(() {
+        _randomMovies =
+            randomMovies.map((json) => MoviesModels.fromJson(json)).toList();
+      });
+    } catch (e) {
+      print('Erro ao carregar os filmes: $e');
+    }
+  }
+
+  Future<void> fetchOldMovies() async {
+    try {
+      final oldMovies = await _moviesService.fetchOldMovies();
+      setState(() {
+        _oldMovies =
+            oldMovies.map((json) => MoviesModels.fromJson(json)).toList();
+
+        print('OLDS api ${_oldMovies.toString()}');
+      });
+    } catch (e) {
+      print('Erro ao carregar os filmes: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
-            Image.asset(
-              'assets/images/diamond_logo.png',
-              fit: BoxFit.cover,
-              height: 60,
-              filterQuality: FilterQuality.high,
-            ),
-            Positioned(
-              right: 8,
-              child: IconButton(
-                onPressed: () {
-                  Modular.to.navigate('/');
-                },
-                icon: const Icon(Icons.exit_to_app, color: Colors.white),
-              ),
-            ),
-          ],
+        title: const Text(''),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              color: Colors.white,
+            );
+          },
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Modular.to.navigate('/');
+            },
+            icon: const Icon(
+              Icons.exit_to_app,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ],
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
-      body: _movies.isNotEmpty
-          ? SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _buildMovieRows(),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Image.asset(
+                  'assets/images/diamond_logo.png',
+                  fit: BoxFit.contain,
+                  height: 90,
+                ),
               ),
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMovieSection('Trending Topics', _movies),
+                        const SizedBox(height: 20),
+                        _buildMovieSection('Random Movies', _randomMovies),
+                        const SizedBox(height: 20),
+                        _buildMovieSection('Old Movies', _oldMovies),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  List<Widget> _buildMovieRows() {
-    final List<Widget> rows = [];
-
-    for (int i = 0; i < _movies.length; i += 20) {
-      final moviesSubset = _movies.skip(i).take(20).toList();
-      rows.add(_buildMovieRow(moviesSubset));
-    }
-
-    return rows;
-  }
-
-  Widget _buildMovieRow(List<dynamic> movies) {
+  Widget _buildMovieSection(String title, List<MoviesModels> movies) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
-            'Trending Topics',
-            style: TextStyle(
+            title,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 247, 247, 247),
@@ -113,46 +163,6 @@ class _MoviesScreenState extends State<MoviesScreen> {
   }
 
   Widget _buildMovieCard(MoviesModels movie) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: SizedBox(
-        width: 120,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.network(
-                    'https://image.tmdb.org/t/p/w500${movie.posterPath}', // Alteração: Acessar os atributos da classe Movie
-                    fit: BoxFit.cover,
-                    height: 180,
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  left: 8,
-                  right: 8,
-                  child: Text(
-                    movie
-                        .title, // Alteração: Acessar os atributos da classe Movie
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+    return MovieCard(movie: movie);
   }
 }

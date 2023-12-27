@@ -51,7 +51,25 @@ class MoviesService {
       );
 
       if (response.statusCode == 200) {
-        print('RANDOMMMM${response.data['results'][1]}');
+        return response.data['results'];
+      } else {
+        throw Exception('Falha ao carregar os filmes RANDOM');
+      }
+    } catch (e) {
+      print('Erro: $e');
+      throw Exception('Erro ao buscar os filmes RANDOMMM');
+    }
+  }
+
+  Future<List<dynamic>> fetchOldMovies() async {
+    try {
+      final Response response = await _dio.get(
+        'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=primary_release_date.asc',
+        queryParameters: {'api_key': apiKey},
+      );
+
+      if (response.statusCode == 200) {
+        print('olddddddddddddddd${response.data['results']}');
         return response.data['results'];
       } else {
         throw Exception('Falha ao carregar os filmes RANDOM');

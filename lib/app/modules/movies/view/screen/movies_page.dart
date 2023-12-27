@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/drawer_islogged.dart';
 
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
@@ -14,12 +15,14 @@ class _MoviesScreenState extends State<MoviesScreen> {
   final MoviesService _moviesService = Modular.get();
   late List<MoviesModels> _movies = [];
   late List<MoviesModels> _randomMovies = [];
+  late List<MoviesModels> _oldMovies = [];
 
   @override
   void initState() {
     super.initState();
     fetchMovies();
     fetchRandomMovies();
+    fetchOldMovies();
   }
 
   Future<void> fetchMovies() async {
@@ -41,8 +44,20 @@ class _MoviesScreenState extends State<MoviesScreen> {
       setState(() {
         _randomMovies =
             randomMovies.map((json) => MoviesModels.fromJson(json)).toList();
+      });
+    } catch (e) {
+      print('Erro ao carregar os filmes: $e');
+    }
+  }
 
-        print('randomm moveis api ${_randomMovies.toString()}');
+  Future<void> fetchOldMovies() async {
+    try {
+      final oldMovies = await _moviesService.fetchOldMovies();
+      setState(() {
+        _oldMovies =
+            oldMovies.map((json) => MoviesModels.fromJson(json)).toList();
+
+        print('OLDS api ${_oldMovies.toString()}');
       });
     } catch (e) {
       print('Erro ao carregar os filmes: $e');
@@ -53,40 +68,68 @@ class _MoviesScreenState extends State<MoviesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
-            Image.asset(
-              'assets/images/diamond_logo.png',
-              fit: BoxFit.cover,
-              height: 60,
-              filterQuality: FilterQuality.high,
-            ),
-            Positioned(
-              right: 8,
-              child: IconButton(
-                onPressed: () {
-                  Modular.to.navigate('/');
-                },
-                icon: const Icon(Icons.exit_to_app, color: Colors.white),
-              ),
-            ),
-          ],
+        title: const Text(''),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Modular.to.navigate('/');
+            },
+            icon: const Icon(
+              Icons.exit_to_app,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ],
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMovieSection('Trending Topics', _movies),
-            const SizedBox(height: 20),
-            _buildMovieSection('Random Movies', _randomMovies),
-          ],
-        ),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Image.asset(
+                  'assets/images/diamond_logo.png',
+                  fit: BoxFit.fill,
+                  height: 90,
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMovieSection('Trending Topics', _movies),
+                        const SizedBox(height: 20),
+                        _buildMovieSection('Random Movies', _randomMovies),
+                        const SizedBox(height: 20),
+                        _buildMovieSection('Old Movies', _oldMovies),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

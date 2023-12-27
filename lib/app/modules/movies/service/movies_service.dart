@@ -33,7 +33,6 @@ class MoviesService {
       );
 
       if (response.statusCode == 200) {
-        print('RESPOBDE SE 1${response.data['results'][1]}');
         return response.data['results'];
       } else {
         throw Exception('Falha ao carregar os filmes populares');
@@ -41,6 +40,25 @@ class MoviesService {
     } catch (e) {
       print('Erro: $e');
       throw Exception('Erro ao buscar os filmes populares');
+    }
+  }
+
+  Future<List<dynamic>> fetchRandomMovies() async {
+    try {
+      final Response response = await _dio.get(
+        'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=2&sort_by=popularity.desc',
+        queryParameters: {'api_key': apiKey},
+      );
+
+      if (response.statusCode == 200) {
+        print('RANDOMMMM${response.data['results'][1]}');
+        return response.data['results'];
+      } else {
+        throw Exception('Falha ao carregar os filmes RANDOM');
+      }
+    } catch (e) {
+      print('Erro: $e');
+      throw Exception('Erro ao buscar os filmes RANDOMMM');
     }
   }
 }

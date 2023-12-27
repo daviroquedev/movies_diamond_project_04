@@ -7,11 +7,13 @@ import 'package:movies_diamond_project_03/app/modules/movies/view/components/dra
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 class MoviesScreen extends StatefulWidget {
+  const MoviesScreen({super.key});
+
   @override
-  _MoviesScreenState createState() => _MoviesScreenState();
+  MoviesScreenState createState() => MoviesScreenState();
 }
 
-class _MoviesScreenState extends State<MoviesScreen> {
+class MoviesScreenState extends State<MoviesScreen> {
   final MoviesService _moviesService = Modular.get();
   late List<MoviesModels> _movies = [];
   late List<MoviesModels> _randomMovies = [];
@@ -76,6 +78,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
+              color: Colors.white,
             );
           },
         ),
@@ -106,7 +109,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                 padding: const EdgeInsets.all(2.0),
                 child: Image.asset(
                   'assets/images/diamond_logo.png',
-                  fit: BoxFit.fill,
+                  fit: BoxFit.contain,
                   height: 90,
                 ),
               ),

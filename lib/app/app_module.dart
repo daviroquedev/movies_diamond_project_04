@@ -1,5 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:movies_diamond_project_03/app/modules/auth/auth_page.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/view/screen/auth_page.dart';
 import 'package:movies_diamond_project_03/app/modules/home/home_page.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/movies_module.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/movies_page.dart';

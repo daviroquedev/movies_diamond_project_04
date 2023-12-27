@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/row_cards.dart';
 
@@ -10,7 +11,8 @@ class MoviesScreen extends StatefulWidget {
 
 class _MoviesScreenState extends State<MoviesScreen> {
   final MoviesService _moviesService = Modular.get();
-  late List<dynamic> _movies = [];
+  late List<MoviesModels> _movies =
+      []; // Alteração: Usar a classe Movie em vez de dynamic
 
   @override
   void initState() {
@@ -22,7 +24,9 @@ class _MoviesScreenState extends State<MoviesScreen> {
     try {
       final movies = await _moviesService.fetchPopularMovies();
       setState(() {
-        _movies = movies;
+        _movies = movies
+            .map((json) => MoviesModels.fromJson(json))
+            .toList(); // Alteração: Mapear os filmes para a classe Movie
       });
     } catch (e) {
       print('Erro ao carregar os filmes: $e');
@@ -33,11 +37,25 @@ class _MoviesScreenState extends State<MoviesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset(
-          'assets/images/diamond_logo.png',
-          fit: BoxFit.cover,
-          height: 60,
-          filterQuality: FilterQuality.high,
+        title: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(
+              'assets/images/diamond_logo.png',
+              fit: BoxFit.cover,
+              height: 60,
+              filterQuality: FilterQuality.high,
+            ),
+            Positioned(
+              right: 8,
+              child: IconButton(
+                onPressed: () {
+                  Modular.to.navigate('/');
+                },
+                icon: const Icon(Icons.exit_to_app, color: Colors.white),
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -73,8 +91,8 @@ class _MoviesScreenState extends State<MoviesScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
             'Trending Topics',
             style: TextStyle(
@@ -94,7 +112,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
     );
   }
 
-  Widget _buildMovieCard(dynamic movie) {
+  Widget _buildMovieCard(MoviesModels movie) {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: SizedBox(
@@ -108,7 +126,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.network(
-                    'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
+                    'https://image.tmdb.org/t/p/w500${movie.posterPath}', // Alteração: Acessar os atributos da classe Movie
                     fit: BoxFit.cover,
                     height: 180,
                   ),
@@ -118,11 +136,12 @@ class _MoviesScreenState extends State<MoviesScreen> {
                   left: 8,
                   right: 8,
                   child: Text(
-                    movie['title'],
+                    movie
+                        .title, // Alteração: Acessar os atributos da classe Movie
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

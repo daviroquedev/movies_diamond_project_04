@@ -1,14 +1,19 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
 
 class SearchDrawer extends StatefulWidget {
   const SearchDrawer({Key? key}) : super(key: key);
 
   @override
-  _SearchDrawerState createState() => _SearchDrawerState();
+  SearchDrawerState createState() => SearchDrawerState();
 }
 
-class _SearchDrawerState extends State<SearchDrawer> {
+class SearchDrawerState extends State<SearchDrawer> {
   final TextEditingController _searchController = TextEditingController();
+  List<dynamic> _searchResults = [];
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -19,19 +24,29 @@ class _SearchDrawerState extends State<SearchDrawer> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel(); // Cancela o timer quando o widget é descartado
     super.dispose();
   }
 
   void _onSearchChanged() {
-    if (_searchController.text.length >= 3) {
-      _searchMovies(_searchController.text);
-    }
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (_searchController.text.length >= 3) {
+        _searchMovies(_searchController.text);
+      }
+    });
   }
 
-  void _searchMovies(String query) {
-    // Implemente aqui a chamada da rota da API para buscar os filmes com base na query
-    // Esta função será chamada automaticamente quando o texto digitado no campo de busca tiver 3 ou mais caracteres
-    // Use a variável "query" para enviar os parâmetros necessários à rota da API
+  Future<void> _searchMovies(String query) async {
+    try {
+      final List<dynamic> results =
+          await Modular.get<MoviesService>().searchMovies(query);
+      setState(() {
+        _searchResults = results;
+      });
+    } catch (e) {
+      print('Erro ao buscar filmes: $e');
+    }
   }
 
   @override
@@ -41,11 +56,11 @@ class _SearchDrawerState extends State<SearchDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           const UserAccountsDrawerHeader(
-            accountName: Text('Nome do Usuário'), // Nome do usuário
-            accountEmail: Text('email@exemplo.com'), // E-mail do usuário
+            accountName: Text('Nome do Usuário'),
+            accountEmail: Text('email@exemplo.com'),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.person), // Imagem de perfil padrão
+              child: Icon(Icons.person),
             ),
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 0, 0, 0),
@@ -63,6 +78,18 @@ class _SearchDrawerState extends State<SearchDrawer> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+                const SizedBox(height: 16),
+                if (_searchResults.isNotEmpty)
+                  Column(
+                    children: _searchResults.map((result) {
+                      return ListTile(
+                        title: Text(result['title']),
+                        onTap: () {
+                          // logica de selecionar um filme da lista
+                        },
+                      );
+                    }).toList(),
+                  ),
               ],
             ),
           ),

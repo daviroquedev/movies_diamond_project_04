@@ -79,4 +79,23 @@ class MoviesService {
       throw Exception('Erro ao buscar os filmes RANDOMMM');
     }
   }
+
+  Future<List<dynamic>> searchMovies(query) async {
+    try {
+      final Response response = await _dio.get(
+        'https://api.themoviedb.org/3/search/movie?query=$query&include_adult=false&language=en-US&page=1',
+        queryParameters: {'api_key': apiKey},
+      );
+
+      if (response.statusCode == 200) {
+        print('olddddddddddddddd${response.data['results']}');
+        return response.data['results'];
+      } else {
+        throw Exception('Falha ao carregar os filmes RANDOM');
+      }
+    } catch (e) {
+      print('Erro: $e');
+      throw Exception('Erro ao buscar os filmes RANDOMMM');
+    }
+  }
 }

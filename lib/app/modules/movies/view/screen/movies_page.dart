@@ -3,7 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/store/movies_store.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/view/components/drawer_islogged.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/screen/drawer_islogged.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 class MoviesScreen extends StatefulWidget {

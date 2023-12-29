@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MovieCard extends StatelessWidget {
   final MoviesModels movie;
@@ -20,11 +21,7 @@ class MovieCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
-                  child: Image.network(
-                    'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                    fit: BoxFit.cover,
-                    height: 180,
-                  ),
+                  child: _buildMovieImage(),
                 ),
                 Positioned(
                   bottom: 8,
@@ -47,6 +44,29 @@ class MovieCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMovieImage() {
+    return Image.network(
+      'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+      loadingBuilder: (BuildContext context, Widget child,
+          ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        } else {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              color: Colors.white,
+              height: 180,
+            ),
+          );
+        }
+      },
+      fit: BoxFit.cover,
+      height: 180,
     );
   }
 }

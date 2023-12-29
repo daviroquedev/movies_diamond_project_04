@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/store/movies_store.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/drawer_islogged.dart';
-
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 class MoviesScreen extends StatefulWidget {
@@ -14,56 +14,15 @@ class MoviesScreen extends StatefulWidget {
 }
 
 class MoviesScreenState extends State<MoviesScreen> {
-  final MoviesService _moviesService = Modular.get();
-  late List<MoviesModels> _movies = [];
-  late List<MoviesModels> _randomMovies = [];
-  late List<MoviesModels> _oldMovies = [];
+  final MoviesStore moviesStore = Modular.get<MoviesStore>();
 
   @override
   void initState() {
     super.initState();
-    fetchMovies();
-    fetchRandomMovies();
-    fetchOldMovies();
-  }
-
-  Future<void> fetchMovies() async {
-    try {
-      final movies = await _moviesService.fetchPopularMovies();
-      setState(() {
-        _movies = movies
-            .map((json) => MoviesModels.fromJson(json))
-            .toList(); // Alteração: Mapear os filmes para a classe Movie
-      });
-    } catch (e) {
-      print('Erro ao carregar os filmes: $e');
-    }
-  }
-
-  Future<void> fetchRandomMovies() async {
-    try {
-      final randomMovies = await _moviesService.fetchRandomMovies();
-      setState(() {
-        _randomMovies =
-            randomMovies.map((json) => MoviesModels.fromJson(json)).toList();
-      });
-    } catch (e) {
-      print('Erro ao carregar os filmes: $e');
-    }
-  }
-
-  Future<void> fetchOldMovies() async {
-    try {
-      final oldMovies = await _moviesService.fetchOldMovies();
-      setState(() {
-        _oldMovies =
-            oldMovies.map((json) => MoviesModels.fromJson(json)).toList();
-
-        print('OLDS api ${_oldMovies.toString()}');
-      });
-    } catch (e) {
-      print('Erro ao carregar os filmes: $e');
-    }
+    // Chama os métodos de busca ao iniciar a tela
+    moviesStore.fetchPopularMovies();
+    moviesStore.fetchRandomMovies();
+    moviesStore.fetchOldMovies();
   }
 
   @override
@@ -100,44 +59,76 @@ class MoviesScreenState extends State<MoviesScreen> {
       ),
       drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Image.asset(
-                  'assets/images/diamond_logo.png',
-                  fit: BoxFit.contain,
-                  height: 90,
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildMovieSection('Trending Topics', _movies),
-                        const SizedBox(height: 20),
-                        _buildMovieSection('Random Movies', _randomMovies),
-                        const SizedBox(height: 20),
-                        _buildMovieSection('Old Movies', _oldMovies),
-                      ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Observer(
+              builder: (_) {
+                final popularMoviesFuture = moviesStore.popularMoviesFuture;
+                final randomMoviesFuture = moviesStore.randomMoviesFuture;
+                final oldMoviesFuture = moviesStore.oldMoviesFuture;
+
+                if (popularMoviesFuture == null ||
+                    randomMoviesFuture == null ||
+                    oldMoviesFuture == null) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (popularMoviesFuture.value == null ||
+                    randomMoviesFuture.value == null ||
+                    oldMoviesFuture.value == null) {
+                  // Handle caso em que os dados ainda estão sendo carregados
+                  return const Center(child: CircularProgressIndicator());
+                } else if (popularMoviesFuture.error != null ||
+                    randomMoviesFuture.error != null ||
+                    oldMoviesFuture.error != null) {
+                  // Handle caso de erro ao carregar os dados
+                  return Center(
+                    child: Text(
+                      'Erro ao carregar os filmes: ${popularMoviesFuture.error}',
                     ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+                  );
+                } else {
+                  // Aqui, popularMoviesFuture.value contém os dados carregados
+                  final popularMovies =
+                      (popularMoviesFuture.value as List<dynamic>)
+                          .map((movie) => MoviesModels.fromJson(movie))
+                          .toList();
+
+                  final randomMovies =
+                      (randomMoviesFuture.value as List<dynamic>)
+                          .map((movie) => MoviesModels.fromJson(movie))
+                          .toList();
+
+                  final oldMovies = (oldMoviesFuture.value as List<dynamic>)
+                      .map((movie) => MoviesModels.fromJson(movie))
+                      .toList();
+
+                  // Utilize os dados para renderizar na UI
+                  return Column(
+                    children: [
+                      _buildMovieSection(
+                          title: 'Trending Topics', movies: popularMovies),
+                      const SizedBox(height: 20),
+                      _buildMovieSection(
+                          title: 'Random Movies', movies: randomMovies),
+                      const SizedBox(height: 20),
+                      _buildMovieSection(
+                          title: 'Old Movies', movies: oldMovies),
+                      // Adicione mais seções se desejar
+                    ],
+                  );
+                }
+              },
+            )
+            // Restante do seu código para outras seções de filmes usando o Observer
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildMovieSection(String title, List<MoviesModels> movies) {
+  Widget _buildMovieSection(
+      {required String title, required List<MoviesModels> movies}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

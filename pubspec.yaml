@@ -39,6 +39,7 @@ dependencies:
   flutter_mobx: ^2.2.0+1
   flutter_modular: ^6.3.2
   dio: ^5.4.0
+  shared_preferences: ^2.0.0
 
 
 

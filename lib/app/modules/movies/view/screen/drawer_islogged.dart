@@ -1,7 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/service/movies_service.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/controller/search_movies_controller.dart';
 
 class SearchDrawer extends StatefulWidget {
   const SearchDrawer({Key? key}) : super(key: key);
@@ -11,42 +10,29 @@ class SearchDrawer extends StatefulWidget {
 }
 
 class SearchDrawerState extends State<SearchDrawer> {
-  final TextEditingController _searchController = TextEditingController();
-  List<dynamic> _searchResults = [];
-  Timer? _debounce;
+  final SearchMoviesController _searchMoviesController =
+      SearchMoviesController();
+  bool _showNoResultsMessage =
+      false; // Variável para controlar a exibição da mensagem
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchChanged);
+    _searchMoviesController.initSearchListener(_updateResults);
+  }
+
+  void _updateResults(List<dynamic> results) {
+    setState(() {
+      _searchMoviesController.searchResults = results;
+      _showNoResultsMessage = results.isEmpty &&
+          _searchMoviesController.searchController.text.length >= 3;
+    });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel(); // Cancela o timer quando o widget é descartado
+    _searchMoviesController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (_searchController.text.length >= 3) {
-        _searchMovies(_searchController.text);
-      }
-    });
-  }
-
-  Future<void> _searchMovies(String query) async {
-    try {
-      final List<dynamic> results =
-          await Modular.get<MoviesService>().searchMovies(query);
-      setState(() {
-        _searchResults = results;
-      });
-    } catch (e) {
-      print('Erro ao buscar filmes: $e');
-    }
   }
 
   @override
@@ -71,7 +57,7 @@ class SearchDrawerState extends State<SearchDrawer> {
             child: Column(
               children: [
                 TextFormField(
-                  controller: _searchController,
+                  controller: _searchMoviesController.searchController,
                   decoration: const InputDecoration(
                     labelText: 'Pesquisar filmes',
                     prefixIcon: Icon(Icons.search),
@@ -79,13 +65,21 @@ class SearchDrawerState extends State<SearchDrawer> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (_searchResults.isNotEmpty)
+                if (_showNoResultsMessage) // Verifica se a mensagem deve ser exibida
+                  const Text(
+                    'Nenhum filme encontrado',
+                    style: TextStyle(
+                        color: Colors
+                            .red), // Personalize o estilo conforme desejado
+                  ),
+                if (_searchMoviesController.searchResults.isNotEmpty)
                   Column(
-                    children: _searchResults.map((result) {
+                    children:
+                        _searchMoviesController.searchResults.map((result) {
                       return ListTile(
                         title: Text(result['title']),
                         onTap: () {
-                          // logica de selecionar um filme da lista
+                          // lógica de selecionar um filme da lista
                         },
                       );
                     }).toList(),

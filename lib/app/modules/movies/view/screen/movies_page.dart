@@ -3,8 +3,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/store/movies_store.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/section_movies_cards.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/drawer_islogged.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 class MoviesScreen extends StatefulWidget {
   const MoviesScreen({super.key});
@@ -44,7 +44,7 @@ class MoviesScreenState extends State<MoviesScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Modular.to.navigate('/');
+              Modular.to.pushNamed('/');
             },
             icon: const Icon(
               Icons.exit_to_app,
@@ -106,14 +106,13 @@ class MoviesScreenState extends State<MoviesScreen> {
                   // Utilize os dados para renderizar na UI
                   return Column(
                     children: [
-                      _buildMovieSection(
+                      buildMovieSection(
                           title: 'Trending Topics', movies: popularMovies),
                       const SizedBox(height: 20),
-                      _buildMovieSection(
+                      buildMovieSection(
                           title: 'Random Movies', movies: randomMovies),
                       const SizedBox(height: 20),
-                      _buildMovieSection(
-                          title: 'Old Movies', movies: oldMovies),
+                      buildMovieSection(title: 'Old Movies', movies: oldMovies),
                       // Adicione mais seções se desejar
                     ],
                   );
@@ -125,35 +124,5 @@ class MoviesScreenState extends State<MoviesScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildMovieSection(
-      {required String title, required List<MoviesModels> movies}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 247, 247, 247),
-            ),
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: movies.map((movie) => _buildMovieCard(movie)).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMovieCard(MoviesModels movie) {
-    return MovieCard(movie: movie);
   }
 }

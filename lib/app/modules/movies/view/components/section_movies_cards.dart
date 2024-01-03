@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/view/components/row_movies_cards.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/movie_cards.dart';
 
 Widget buildMovieSection(
     {required String title, required List<MoviesModels> movies}) {

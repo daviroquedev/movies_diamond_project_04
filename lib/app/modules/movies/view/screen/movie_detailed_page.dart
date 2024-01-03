@@ -47,7 +47,6 @@ class MovieDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Imagem do filme no topo
             Image.network(
               'https://image.tmdb.org/t/p/w500${movie.posterPath}',
               fit: BoxFit.fill,
@@ -58,7 +57,6 @@ class MovieDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Mostrar informações do filme
                   Text(
                     'Título: ${movie.title}',
                     style: const TextStyle(
@@ -82,7 +80,6 @@ class MovieDetailsPage extends StatelessWidget {
                     'Visão geral: ${movie.overview}',
                     style: const TextStyle(color: Colors.white),
                   ),
-                  // Adicione mais informações conforme necessário
                 ],
               ),
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/controller/search_movies_controller.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
 
 class SearchDrawer extends StatefulWidget {
   const SearchDrawer({Key? key}) : super(key: key);
@@ -65,21 +67,40 @@ class SearchDrawerState extends State<SearchDrawer> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (_showNoResultsMessage) // Verifica se a mensagem deve ser exibida
+                if (_showNoResultsMessage)
                   const Text(
                     'Nenhum filme encontrado',
-                    style: TextStyle(
-                        color: Colors
-                            .red), // Personalize o estilo conforme desejado
+                    style: TextStyle(color: Colors.red),
                   ),
                 if (_searchMoviesController.searchResults.isNotEmpty)
                   Column(
                     children:
                         _searchMoviesController.searchResults.map((result) {
+                      final posterPath = result['poster_path'];
                       return ListTile(
+                        leading: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: posterPath != null && posterPath.isNotEmpty
+                                ? Image.network(
+                                    'https://image.tmdb.org/t/p/w500$posterPath',
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/images/placeholder_noimg.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
                         title: Text(result['title']),
                         onTap: () {
-                          // lógica de selecionar um filme da lista
+                          MoviesModels movie = MoviesModels.fromJson(result);
+                          Modular.to.pushNamed(
+                            '/movies/detailed/${result['id']}',
+                            arguments: movie,
+                          );
                         },
                       );
                     }).toList(),

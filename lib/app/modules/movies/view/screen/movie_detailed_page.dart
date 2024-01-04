@@ -48,8 +48,8 @@ class MovieDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.network(
-              'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-              fit: BoxFit.fill,
+              'https://image.tmdb.org/t/p/w500${movie.backdropPath}',
+              fit: BoxFit.cover,
               height: 470,
             ),
             Padding(

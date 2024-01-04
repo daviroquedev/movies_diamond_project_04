@@ -17,6 +17,8 @@ class MovieCard extends StatelessWidget {
         final movieDetailsService = Modular.get<MovieDetailsService>();
         movieDetailsService.setSelectedMovie(movie);
 
+        print('MOVIEE $movie');
+
         Modular.to.pushNamed('/movies/detailed/${movie.id}', arguments: movie);
       },
       child: Padding(
@@ -59,7 +61,6 @@ class MovieCard extends StatelessWidget {
   }
 
   Widget _buildMovieImage() {
-    print(movie);
     return Image.network(
       'https://image.tmdb.org/t/p/w500${movie.posterPath}',
       loadingBuilder: (BuildContext context, Widget child,

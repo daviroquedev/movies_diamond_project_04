@@ -70,7 +70,6 @@ class MoviesService {
       );
 
       if (response.statusCode == 200) {
-        print('olddddddddddddddd${response.data['results']}');
         return response.data['results'];
       } else {
         throw Exception('Falha ao carregar os filmes RANDOM');
@@ -89,7 +88,6 @@ class MoviesService {
       );
 
       if (response.statusCode == 200) {
-        print('olddddddddddddddd${response.data['results']}');
         return response.data['results'];
       } else {
         throw Exception('Falha ao carregar os filmes RANDOM');

@@ -61,20 +61,24 @@ class MovieBannerCarousel extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
+                                    flex: 3,
                                     child: Text(
                                       movie.title,
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.start,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  RatingStars(
-                                    voteAverage: movie.voteAverage,
+                                  Expanded(
+                                    flex: 2,
+                                    child: RatingStars(
+                                      voteAverage: movie.voteAverage,
+                                    ),
                                   ),
                                 ],
                               ),

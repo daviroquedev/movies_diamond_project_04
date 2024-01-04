@@ -36,18 +36,22 @@ class MovieCard extends StatelessWidget {
                     child: _buildMovieImage(),
                   ),
                   Positioned(
-                    bottom: 8,
-                    left: 8,
-                    right: 8,
-                    child: Text(
-                      movie.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      color: Colors.black.withOpacity(0.5),
+                      child: Text(
+                        movie.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -80,26 +84,6 @@ class MovieCard extends StatelessWidget {
       },
       fit: BoxFit.cover,
       height: 180,
-    );
-  }
-}
-
-// Exemplo de página de descrição do filme (crie conforme sua estrutura)
-class MovieDescriptionPage extends StatelessWidget {
-  final MoviesModels movie;
-
-  const MovieDescriptionPage({Key? key, required this.movie}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Implemente a estrutura da página de descrição do filme aqui
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(movie.title),
-      ),
-      body: Center(
-        child: Text('Descrição do Filme: ${movie.title}'),
-      ),
     );
   }
 }

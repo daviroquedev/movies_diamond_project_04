@@ -13,18 +13,6 @@ abstract class _MoviesStore with Store {
   @observable
   ObservableFuture<dynamic>? movieDetailsFuture;
 
-  @observable
-  ObservableFuture<List<dynamic>>? popularMoviesFuture;
-
-  @observable
-  ObservableFuture<List<dynamic>>? randomMoviesFuture;
-
-  @observable
-  ObservableFuture<List<dynamic>>? oldMoviesFuture;
-
-  @observable
-  ObservableFuture<List<dynamic>>? searchMoviesFuture;
-
   @action
   Future<dynamic> fetchMovieDetails(int movieId) async {
     movieDetailsFuture =
@@ -32,11 +20,17 @@ abstract class _MoviesStore with Store {
     return await movieDetailsFuture!;
   }
 
+  @observable
+  ObservableFuture<List<dynamic>>? popularMoviesFuture;
+
   @action
   Future<List<dynamic>> fetchPopularMovies() async {
     popularMoviesFuture = ObservableFuture(_moviesService.fetchPopularMovies());
     return await popularMoviesFuture!;
   }
+
+  @observable
+  ObservableFuture<List<dynamic>>? randomMoviesFuture;
 
   @action
   Future<List<dynamic>> fetchRandomMovies() async {
@@ -44,15 +38,31 @@ abstract class _MoviesStore with Store {
     return await randomMoviesFuture!;
   }
 
+  @observable
+  ObservableFuture<List<dynamic>>? oldMoviesFuture;
+
   @action
   Future<List<dynamic>> fetchOldMovies() async {
     oldMoviesFuture = ObservableFuture(_moviesService.fetchOldMovies());
     return await oldMoviesFuture!;
   }
 
+  @observable
+  ObservableFuture<List<dynamic>>? searchMoviesFuture;
+
   @action
   Future<List<dynamic>> searchMovies(String query) async {
     searchMoviesFuture = ObservableFuture(_moviesService.searchMovies(query));
     return await searchMoviesFuture!;
+  }
+
+  @observable
+  ObservableFuture<List<dynamic>>? topRatedMoviesFuture;
+
+  @action
+  Future<List<dynamic>> fetchTopRatedMovies() async {
+    topRatedMoviesFuture =
+        ObservableFuture(_moviesService.fetchTopRatedMovies());
+    return await topRatedMoviesFuture!;
   }
 }

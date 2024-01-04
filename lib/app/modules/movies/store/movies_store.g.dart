@@ -89,6 +89,23 @@ mixin _$MoviesStore on _MoviesStore, Store {
     });
   }
 
+  late final _$topRatedMoviesFutureAtom =
+      Atom(name: '_MoviesStore.topRatedMoviesFuture', context: context);
+
+  @override
+  ObservableFuture<List<dynamic>>? get topRatedMoviesFuture {
+    _$topRatedMoviesFutureAtom.reportRead();
+    return super.topRatedMoviesFuture;
+  }
+
+  @override
+  set topRatedMoviesFuture(ObservableFuture<List<dynamic>>? value) {
+    _$topRatedMoviesFutureAtom.reportWrite(value, super.topRatedMoviesFuture,
+        () {
+      super.topRatedMoviesFuture = value;
+    });
+  }
+
   late final _$fetchMovieDetailsAsyncAction =
       AsyncAction('_MoviesStore.fetchMovieDetails', context: context);
 
@@ -131,6 +148,15 @@ mixin _$MoviesStore on _MoviesStore, Store {
     return _$searchMoviesAsyncAction.run(() => super.searchMovies(query));
   }
 
+  late final _$fetchTopRatedMoviesAsyncAction =
+      AsyncAction('_MoviesStore.fetchTopRatedMovies', context: context);
+
+  @override
+  Future<List<dynamic>> fetchTopRatedMovies() {
+    return _$fetchTopRatedMoviesAsyncAction
+        .run(() => super.fetchTopRatedMovies());
+  }
+
   @override
   String toString() {
     return '''
@@ -138,7 +164,8 @@ movieDetailsFuture: ${movieDetailsFuture},
 popularMoviesFuture: ${popularMoviesFuture},
 randomMoviesFuture: ${randomMoviesFuture},
 oldMoviesFuture: ${oldMoviesFuture},
-searchMoviesFuture: ${searchMoviesFuture}
+searchMoviesFuture: ${searchMoviesFuture},
+topRatedMoviesFuture: ${topRatedMoviesFuture}
     ''';
   }
 }

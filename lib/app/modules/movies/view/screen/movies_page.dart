@@ -3,6 +3,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/store/movies_store.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/app_bar_logged.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/carrousel_cards.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/section_movies_cards.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/drawer_islogged.dart';
 
@@ -23,40 +25,13 @@ class MoviesScreenState extends State<MoviesScreen> {
     moviesStore.fetchPopularMovies();
     moviesStore.fetchRandomMovies();
     moviesStore.fetchOldMovies();
+    moviesStore.fetchTopRatedMovies();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              color: Colors.white,
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Modular.to.pushNamed('/');
-            },
-            icon: const Icon(
-              Icons.exit_to_app,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-        ],
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: const AppBarLogged(),
       drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -68,6 +43,7 @@ class MoviesScreenState extends State<MoviesScreen> {
                 final popularMoviesFuture = moviesStore.popularMoviesFuture;
                 final randomMoviesFuture = moviesStore.randomMoviesFuture;
                 final oldMoviesFuture = moviesStore.oldMoviesFuture;
+                final topRatedMoviesFuture = moviesStore.topRatedMoviesFuture;
 
                 if (popularMoviesFuture == null ||
                     randomMoviesFuture == null ||
@@ -75,12 +51,15 @@ class MoviesScreenState extends State<MoviesScreen> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (popularMoviesFuture.value == null ||
                     randomMoviesFuture.value == null ||
-                    oldMoviesFuture.value == null) {
+                    oldMoviesFuture.value == null ||
+                    topRatedMoviesFuture == null ||
+                    topRatedMoviesFuture.value == null) {
                   // Handle caso em que os dados ainda estão sendo carregados
                   return const Center(child: CircularProgressIndicator());
                 } else if (popularMoviesFuture.error != null ||
                     randomMoviesFuture.error != null ||
-                    oldMoviesFuture.error != null) {
+                    oldMoviesFuture.error != null ||
+                    topRatedMoviesFuture.error != null) {
                   // Handle caso de erro ao carregar os dados
                   return Center(
                     child: Text(
@@ -103,9 +82,15 @@ class MoviesScreenState extends State<MoviesScreen> {
                       .map((movie) => MoviesModels.fromJson(movie))
                       .toList();
 
+                  final topRatedMovies =
+                      (topRatedMoviesFuture.value as List<dynamic>)
+                          .map((movie) => MoviesModels.fromJson(movie))
+                          .toList();
+
                   // Utilize os dados para renderizar na UI
                   return Column(
                     children: [
+                      MovieBannerCarousel(movies: topRatedMovies),
                       buildMovieSection(
                           title: 'Trending Topics', movies: popularMovies),
                       const SizedBox(height: 20),
@@ -113,7 +98,6 @@ class MoviesScreenState extends State<MoviesScreen> {
                           title: 'Random Movies', movies: randomMovies),
                       const SizedBox(height: 20),
                       buildMovieSection(title: 'Old Movies', movies: oldMovies),
-                      // Adicione mais seções se desejar
                     ],
                   );
                 }

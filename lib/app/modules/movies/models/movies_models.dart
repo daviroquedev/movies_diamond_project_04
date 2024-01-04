@@ -1,13 +1,13 @@
 class MoviesModels {
   final bool adult;
-  final String backdropPath;
+  final String? backdropPath;
   final List<int> genreIds;
   final int id;
   final String originalLanguage;
   final String originalTitle;
   final String overview;
   final double popularity;
-  final String posterPath;
+  final String? posterPath;
   final String releaseDate;
   final String title;
   final bool video;
@@ -34,7 +34,7 @@ class MoviesModels {
   factory MoviesModels.fromJson(Map<String, dynamic> json) {
     return MoviesModels(
       adult: json['adult'] ?? false,
-      backdropPath: json['backdrop_path'] ?? 'sem info',
+      backdropPath: json['backdrop_path'],
       genreIds: (json['genre_ids'] as List<dynamic>?)
               ?.map<int>((id) => id as int)
               .toList() ??
@@ -44,7 +44,7 @@ class MoviesModels {
       originalTitle: json['original_title'] ?? 'sem info',
       overview: json['overview'] ?? 'sem info',
       popularity: json['popularity']?.toDouble() ?? 0.0,
-      posterPath: json['poster_path'] ?? 'sem info',
+      posterPath: json['poster_path'],
       releaseDate: json['release_date'] ?? 'sem info',
       title: json['title'] ?? 'sem info',
       video: json['video'] ?? false,

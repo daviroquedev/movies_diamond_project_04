@@ -17,14 +17,5 @@ class AppModule extends Module {
     r.child('/', child: (context) => HomePage());
     r.module('/movies/', module: MoviesModule());
     r.child('/auth', child: (context) => AuthPage());
-    // r.child('/movies/detailed/:id', child: (context) {
-    //   final id = r.args.params['id'];
-    //   print('ID $id');
-
-    //   final movie = r.args.data
-    //       as MoviesModels; // Obtendo o objeto passado como argumento
-    //   print('MOVIEEEEEEEEEEEEEEEE $movie');
-    //   return MovieDetailsPage(movie: movie);
-    // });
   }
 }

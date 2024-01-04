@@ -97,4 +97,22 @@ class MoviesService {
       throw Exception('Erro ao buscar os filmes RANDOMMM');
     }
   }
+
+  Future<List<dynamic>> fetchTopRatedMovies() async {
+    try {
+      final Response response = await _dio.get(
+        'https://api.themoviedb.org/3/movie/top_rated',
+        queryParameters: {'api_key': apiKey},
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['results'];
+      } else {
+        throw Exception('Falha ao carregar os filmes mais bem avaliados');
+      }
+    } catch (e) {
+      print('Erro: $e');
+      throw Exception('Erro ao buscar os filmes mais bem avaliados');
+    }
+  }
 }

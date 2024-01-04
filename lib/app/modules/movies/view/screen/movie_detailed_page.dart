@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/movies_module.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/app_bar_logged.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/star_rating.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/drawer_islogged.dart';
 
 class MovieDetailsPage extends StatelessWidget {
@@ -12,35 +12,7 @@ class MovieDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              color: Colors.white,
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Modular.to.pop();
-            },
-            icon: const Icon(
-              Icons.exit_to_app,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-        ],
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: const AppBarLogged(),
       drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -58,26 +30,27 @@ class MovieDetailsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Título: ${movie.title}',
+                    movie.title,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Lançamento: ${movie.releaseDate}',
-                    style: const TextStyle(color: Colors.white),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      RatingStars(voteAverage: movie.voteAverage),
+                      Text(
+                        'Lançamento: ${movie.releaseDate}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
-                    'Avaliação: ${movie.voteAverage.toString()}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Visão geral: ${movie.overview}',
+                    movie.overview,
                     style: const TextStyle(color: Colors.white),
                   ),
                 ],

@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.moviesdiamond.movies_diamond_project_03">
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="movies_diamond_project_03"
         android:name="${applicationName}"
@@ -29,5 +31,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+        android:name="com.google.android.gms.auth.api.signin.client.CLIENT_ID"
+        android:value="24899862376-up38t27rboq1sehg5qud43hor7dhldnu.apps.googleusercontent.com" />
     </application>
 </manifest>

@@ -20,7 +20,7 @@ Certifique-se de ter o ambiente de desenvolvimento configurado para Flutter. Par
 
 2. Acesse o diretório do projeto:
    
-     `cd seu-projeto`
+     `cd movies_diamond_project_04`
 
 3. Instale as dependências do projeto:
 

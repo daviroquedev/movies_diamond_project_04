@@ -24,10 +24,10 @@ class RatingStars extends StatelessWidget {
             _buildStar(Icons.star_border, emptyStars),
           ],
         ),
-        SizedBox(width: 4), // Espaçamento entre as estrelas e os valores
+        const SizedBox(width: 4),
         Text(
-          '(${voteAverage.toStringAsFixed(1)})', // Formatação para uma casa decimal
-          style: TextStyle(color: Colors.white), // Estilo do texto
+          '(${voteAverage.toStringAsFixed(1)})',
+          style: const TextStyle(color: Colors.white),
         ),
       ],
     );

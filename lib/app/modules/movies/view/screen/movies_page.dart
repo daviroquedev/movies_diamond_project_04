@@ -21,7 +21,6 @@ class MoviesScreenState extends State<MoviesScreen> {
   @override
   void initState() {
     super.initState();
-    // Chama os métodos de busca ao iniciar a tela
     moviesStore.fetchPopularMovies();
     moviesStore.fetchRandomMovies();
     moviesStore.fetchOldMovies();

@@ -116,7 +116,7 @@ class MovieBannerCarousel extends StatelessWidget {
           );
         }
       },
-      fit: BoxFit.fill,
+      fit: BoxFit.fitHeight,
       height: 300,
       width: double.infinity,
     );

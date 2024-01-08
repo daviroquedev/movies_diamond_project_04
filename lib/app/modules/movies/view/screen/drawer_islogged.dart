@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/store/auth_google_store.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/controller/search_movies_controller.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
-import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
 
 class SearchDrawer extends StatefulWidget {
   const SearchDrawer({Key? key}) : super(key: key);
@@ -14,8 +14,8 @@ class SearchDrawer extends StatefulWidget {
 class SearchDrawerState extends State<SearchDrawer> {
   final SearchMoviesController _searchMoviesController =
       SearchMoviesController();
-  bool _showNoResultsMessage =
-      false; // Variável para controlar a exibição da mensagem
+  bool _showNoResultsMessage = false;
+  final UserStore _userStore = Modular.get<UserStore>();
 
   @override
   void initState() {
@@ -42,16 +42,24 @@ class SearchDrawerState extends State<SearchDrawer> {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: <Widget>[
-          const UserAccountsDrawerHeader(
-            accountName: Text('Nome do Usuário'),
-            accountEmail: Text('email@exemplo.com'),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person),
-            ),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 0, 0, 0),
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: _userStore.isLogged
+                ? Text(_userStore.userName ?? '')
+                : const Text('VISITANTE'),
+            accountEmail: _userStore.isLogged
+                ? Text(_userStore.userEmail ?? '')
+                : const Text('registre-se'),
+            currentAccountPicture: _userStore.isLogged
+                ? CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(_userStore.userPhotoUrl ?? ''),
+                  )
+                : const CircleAvatar(
+                    child: Icon(Icons.account_circle, size: 60),
+                  ),
+            decoration: const BoxDecoration(
+              color: Colors.black,
             ),
           ),
           Padding(

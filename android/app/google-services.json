@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "534769506929",
+    "project_id": "movies-diamond",
+    "storage_bucket": "movies-diamond.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534769506929:android:a8639d5574077e1c26d9d0",
+        "android_client_info": {
+          "package_name": "com.moviesdiamond.movies_diamond_project_03"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUE0Mffr_nsmRGINl_D25IDOCD_VPMWQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

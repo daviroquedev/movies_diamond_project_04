@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/auth_module.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/store/movies_store.dart';
@@ -15,6 +16,7 @@ class MoviesModule extends Module {
     i.addSingleton(MoviesService.new);
     i.addSingleton(MoviesStore.new);
     i.addSingleton(MovieDetailsService.new);
+    // i.addSingleton(UserStore.new);
   }
 
   @override
@@ -26,6 +28,7 @@ class MoviesModule extends Module {
 
       return MovieDetailsPage(movie: movie);
     });
+    // r.module('/auth/', module: AuthModule());
   }
 }
 

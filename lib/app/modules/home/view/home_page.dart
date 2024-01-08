@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => Modular.to.navigate('/auth'),
+            onPressed: () => Modular.to.navigate('/auth/'),
             child: const Text('auth'),
           ),
         ],

@@ -38,55 +38,76 @@ class MovieBannerCarousel extends StatelessWidget {
                   Modular.to.pushNamed('/movies/detailed/${movie.id}',
                       arguments: movie);
                 },
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: _buildMovieImage(movie.posterPath),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              color: Colors.black.withOpacity(0.5),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text(
-                                      movie.title,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: _buildMovieImage(movie.backdropPath),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                color: Colors.black.withOpacity(0.5),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Text(
+                                            movie.title,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          flex: 2,
+                                          child: RatingStars(
+                                            voteAverage: movie.voteAverage,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    flex: 2,
-                                    child: RatingStars(
-                                      voteAverage: movie.voteAverage,
-                                    ),
-                                  ),
-                                ],
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            movie.overview,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -116,7 +137,7 @@ class MovieBannerCarousel extends StatelessWidget {
           );
         }
       },
-      fit: BoxFit.fill,
+      fit: BoxFit.cover,
       height: 300,
       width: double.infinity,
     );

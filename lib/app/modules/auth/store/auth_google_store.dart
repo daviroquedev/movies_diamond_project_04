@@ -1,3 +1,4 @@
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 part 'auth_google_store.g.dart';
@@ -32,5 +33,6 @@ abstract class _UserStore with Store {
     userEmail = null;
     userPhotoUrl = null;
     isLogged = false;
+    Modular.to.navigate('/');
   }
 }

@@ -39,6 +39,7 @@ class SearchDrawerState extends State<SearchDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    print('URI IMG ${_userStore.userEmail}');
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,

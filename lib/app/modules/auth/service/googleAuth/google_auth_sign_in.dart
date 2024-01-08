@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
 
 class SignInScreen extends StatelessWidget {
   final UserStore userStore = Modular.get();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   SignInScreen({super.key});
 
@@ -46,6 +47,13 @@ class SignInScreen extends StatelessWidget {
 
       Modular.to.pushNamed('/movies/');
     }
+  }
+
+  Future<void> _handleSignOut() async {
+    await _googleSignIn.signOut(); // Deslogar o usuário do Google
+    // Limpar os detalhes do usuário no seu aplicativo usando o UserStore
+    userStore.logout(); // Chama o método logout do UserStore
+    Modular.to.pushNamed('/'); // Supondo que '/' é a rota para a tela de login
   }
 
   @override

@@ -93,7 +93,7 @@ class MovieBannerCarousel extends StatelessWidget {
                                             movie.overview,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.white,
                                             ),
                                           ),

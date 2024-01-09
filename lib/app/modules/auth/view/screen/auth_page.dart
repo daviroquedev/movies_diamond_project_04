@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/google_auth_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/view/components/buttons_custom.dart';
 
 class AuthPage extends StatelessWidget {
@@ -53,6 +54,9 @@ class AuthPage extends StatelessWidget {
             customButtons.buildElevatedButton(
               text: 'LOGAR COM GOOGLE',
               onPressed: () {
+                SignInScreen signInScreen = SignInScreen();
+
+                signInScreen.handleSignIn();
                 // lógica de login com o Google
               },
               buttonColor: Colors.blue,

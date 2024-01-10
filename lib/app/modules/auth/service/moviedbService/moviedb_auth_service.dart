@@ -2,7 +2,6 @@
 // https://api.themoviedb.org/3/authentication/guest_session/new _
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
 class AuthApi {
   final Dio _dio;

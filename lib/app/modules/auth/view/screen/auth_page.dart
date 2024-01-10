@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/google_auth_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/view/components/buttons_custom.dart';
 
 class AuthPage extends StatelessWidget {
-  final CustomButtons customButtons =
-      CustomButtons(); // Instância da classe de botões
+  final CustomButtons customButtons = CustomButtons();
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +12,20 @@ class AuthPage extends StatelessWidget {
       appBar: AppBar(
         title: Image.asset(
           'assets/images/diamond_logo.png',
-          height: 70,
+          height: 100,
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Modular.to.navigate('/');
+          },
+        ),
       ),
       backgroundColor: Colors.black,
       body: Padding(
@@ -53,6 +62,8 @@ class AuthPage extends StatelessWidget {
             customButtons.buildElevatedButton(
               text: 'LOGAR COM GOOGLE',
               onPressed: () {
+                SignInScreen signInScreen = SignInScreen();
+                signInScreen.handleSignIn();
                 // lógica de login com o Google
               },
               buttonColor: Colors.blue,

@@ -4,6 +4,7 @@ import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/go
 import 'package:movies_diamond_project_03/app/modules/auth/service/moviedbService/moviedb_auth_service.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/store/auth_google_store.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/view/screen/auth_page.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/view/screen/authorized_page.dart';
 
 class AuthModule extends Module {
   @override

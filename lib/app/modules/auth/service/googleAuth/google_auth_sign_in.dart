@@ -13,52 +13,74 @@ class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
   Future<void> handleSignIn() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser = await signInWithGoogle();
 
     if (googleUser != null) {
-      userStore.setUserDetails(
-        name: googleUser.displayName ?? 'TESTE',
-        email: googleUser.email ?? '',
-        photoUrl: googleUser.photoUrl ?? '',
-      );
-
-      final user = <String, dynamic>{
-        "name": "${googleUser.displayName}",
-        "email": googleUser.email,
-      };
+      setUserDetails(googleUser);
 
       try {
-        final db = FirebaseFirestore.instance;
-        final docRef = await db.collection("users").add(user);
-        final String apiKey = '9598d00230dc09769db0762336124969';
+        const String apiKey = '9598d00230dc09769db0762336124969';
+        final String requestToken = await getRequestToken(apiKey);
 
-        print('DocumentSnapshot added with ID: ${docRef.id}');
+        print('REQUEST TOKEN $requestToken');
 
-        // Chamada para criar session_id e associá-lo ao usuário no Firestore
-        final requestToken = await authApi
-            .requestToken(apiKey // Substitua pelo seu API key do The Movie DB
-                // Substitua pelo seu token de solicitação (se aplicável)
-                );
+        await addRequestTokenToUserInFirestore(requestToken);
 
-        print('REQUEST TOKENNNNNNNNNNNNN $requestToken');
+        // print('TENTANDO ABRIR A URL');
 
-        // Associar o session_id ao documento do usuário recém-criado
-        await db.collection("users").doc(docRef.id).update({
-          "request_token": requestToken,
-        });
+        // try {
+        //   await authApi.requestUserPermission(requestToken);
+        //   print('era pra ta aberta');
+        // } catch (e) {
+        //   print(e);
+        // }
 
-        print('REQUEST TOKEN added to user in Firestore: $requestToken');
+        print('era pra ta aberta');
       } catch (e) {
         print('Error adding user/session: $e');
       }
 
-      print('Detalhes do usuário alterados:');
-      print('Name: ${userStore.userName}');
-      print('Email: ${userStore.userEmail}');
-      print('PhotoUrl: ${userStore.userPhotoUrl}');
+      printUserDetails();
 
       Modular.to.pushNamed('/movies/');
     }
+  }
+
+  Future<GoogleSignInAccount?> signInWithGoogle() async {
+    return await googleSignIn.signIn();
+  }
+
+  void setUserDetails(GoogleSignInAccount googleUser) {
+    userStore.setUserDetails(
+      name: googleUser.displayName ?? 'TESTE',
+      email: googleUser.email ?? '',
+      photoUrl: googleUser.photoUrl ?? '',
+    );
+  }
+
+  Future<String> getRequestToken(String apiKey) async {
+    return await authApi.requestToken(apiKey);
+  }
+
+  Future<void> addRequestTokenToUserInFirestore(String requestToken) async {
+    final db = FirebaseFirestore.instance;
+    final docRef = await db.collection("users").add({
+      "name": userStore.userName,
+      "email": userStore.userEmail,
+    });
+
+    await db.collection("users").doc(docRef.id).update({
+      "request_token": requestToken,
+    });
+
+    print('REQUEST TOKEN added to user in Firestore: $requestToken');
+  }
+
+  void printUserDetails() {
+    print('Detalhes do usuário alterados:');
+    print('Name: ${userStore.userName}');
+    print('Email: ${userStore.userEmail}');
+    print('PhotoUrl: ${userStore.userPhotoUrl}');
   }
 
   @override

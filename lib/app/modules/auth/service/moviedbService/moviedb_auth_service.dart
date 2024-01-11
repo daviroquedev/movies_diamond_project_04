@@ -1,6 +1,3 @@
-// https://developer.themoviedb.org/reference/authentication-create-guest-session
-// https://api.themoviedb.org/3/authentication/guest_session/new _
-
 import 'package:dio/dio.dart';
 
 class AuthApi {
@@ -16,7 +13,7 @@ class AuthApi {
       );
 
       if (response.statusCode == 200) {
-        return response.data['request_token']; // Retornar apenas o token
+        return response.data['request_token'];
       } else {
         throw Exception('Falha ao criar o request_token');
       }

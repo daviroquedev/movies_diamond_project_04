@@ -26,10 +26,7 @@ class AppBarLogged extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: () async {
-            final NavigatorState navigator = Navigator.of(context);
-
             if (Modular.to.path.contains('/movies/detailed')) {
-              print('RETORNOU A TELA');
               return Modular.to.pop();
             }
 
@@ -38,8 +35,6 @@ class AppBarLogged extends StatelessWidget implements PreferredSizeWidget {
 
             await googleSignIn.signOut();
             userStore.logout();
-
-            print('DESLOGADO: ');
           },
           icon: const Icon(
             Icons.exit_to_app,

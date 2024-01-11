@@ -21,6 +21,10 @@ class MoviesScreenState extends State<MoviesScreen> {
   @override
   void initState() {
     super.initState();
+    fetchMovies();
+  }
+
+  void fetchMovies() {
     moviesStore.fetchPopularMovies();
     moviesStore.fetchRandomMovies();
     moviesStore.fetchOldMovies();
@@ -34,78 +38,77 @@ class MoviesScreenState extends State<MoviesScreen> {
       drawer: const SearchDrawer(),
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Observer(
-              builder: (_) {
-                final popularMoviesFuture = moviesStore.popularMoviesFuture;
-                final randomMoviesFuture = moviesStore.randomMoviesFuture;
-                final oldMoviesFuture = moviesStore.oldMoviesFuture;
-                final topRatedMoviesFuture = moviesStore.topRatedMoviesFuture;
-
-                if (popularMoviesFuture == null ||
-                    randomMoviesFuture == null ||
-                    oldMoviesFuture == null) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (popularMoviesFuture.value == null ||
-                    randomMoviesFuture.value == null ||
-                    oldMoviesFuture.value == null ||
-                    topRatedMoviesFuture == null ||
-                    topRatedMoviesFuture.value == null) {
-                  // Handle caso em que os dados ainda estão sendo carregados
-                  return const Center(child: CircularProgressIndicator());
-                } else if (popularMoviesFuture.error != null ||
-                    randomMoviesFuture.error != null ||
-                    oldMoviesFuture.error != null ||
-                    topRatedMoviesFuture.error != null) {
-                  // Handle caso de erro ao carregar os dados
-                  return Center(
-                    child: Text(
-                      'Erro ao carregar os filmes: ${popularMoviesFuture.error}',
-                    ),
-                  );
-                } else {
-                  // Aqui, popularMoviesFuture.value contém os dados carregados
-                  final popularMovies =
-                      (popularMoviesFuture.value as List<dynamic>)
-                          .map((movie) => MoviesModels.fromJson(movie))
-                          .toList();
-
-                  final randomMovies =
-                      (randomMoviesFuture.value as List<dynamic>)
-                          .map((movie) => MoviesModels.fromJson(movie))
-                          .toList();
-
-                  final oldMovies = (oldMoviesFuture.value as List<dynamic>)
-                      .map((movie) => MoviesModels.fromJson(movie))
-                      .toList();
-
-                  final topRatedMovies =
-                      (topRatedMoviesFuture.value as List<dynamic>)
-                          .map((movie) => MoviesModels.fromJson(movie))
-                          .toList();
-
-                  // Utilize os dados para renderizar na UI
-                  return Column(
-                    children: [
-                      MovieBannerCarousel(movies: topRatedMovies),
-                      buildMovieSection(
-                          title: 'Trending Topics', movies: popularMovies),
-                      const SizedBox(height: 20),
-                      buildMovieSection(
-                          title: 'Random Movies', movies: randomMovies),
-                      const SizedBox(height: 20),
-                      buildMovieSection(title: 'Old Movies', movies: oldMovies),
-                    ],
-                  );
-                }
-              },
-            )
-            // Restante do seu código para outras seções de filmes usando o Observer
-          ],
+        child: Observer(
+          builder: (_) {
+            return _buildMoviesContent();
+          },
         ),
       ),
     );
+  }
+
+  Widget _buildMoviesContent() {
+    final popularMoviesFuture = moviesStore.popularMoviesFuture;
+    final randomMoviesFuture = moviesStore.randomMoviesFuture;
+    final oldMoviesFuture = moviesStore.oldMoviesFuture;
+    final topRatedMoviesFuture = moviesStore.topRatedMoviesFuture;
+
+    if (popularMoviesFuture == null ||
+        randomMoviesFuture == null ||
+        oldMoviesFuture == null) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (popularMoviesFuture.result == null ||
+        randomMoviesFuture.result == null ||
+        oldMoviesFuture.result == null ||
+        topRatedMoviesFuture == null ||
+        topRatedMoviesFuture.result == null) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (popularMoviesFuture.error != null ||
+        randomMoviesFuture.error != null ||
+        oldMoviesFuture.error != null ||
+        topRatedMoviesFuture.error != null) {
+      return _buildErrorWidget();
+    } else {
+      return _buildMoviesSections();
+    }
+  }
+
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Text(
+        'Erro ao carregar os filmes: ${moviesStore.popularMoviesFuture?.error}',
+      ),
+    );
+  }
+
+  Widget _buildMoviesSections() {
+    final popularMovies =
+        _getMoviesList(moviesStore.popularMoviesFuture?.result);
+    final randomMovies = _getMoviesList(moviesStore.randomMoviesFuture?.result);
+    final oldMovies = _getMoviesList(moviesStore.oldMoviesFuture?.result);
+    final topRatedMovies =
+        _getMoviesList(moviesStore.topRatedMoviesFuture?.result);
+
+    return Column(
+      children: [
+        MovieBannerCarousel(movies: topRatedMovies),
+        _buildMovieSection(title: 'Trending Topics', movies: popularMovies),
+        const SizedBox(height: 20),
+        _buildMovieSection(title: 'Random Movies', movies: randomMovies),
+        const SizedBox(height: 20),
+        _buildMovieSection(title: 'Old Movies', movies: oldMovies),
+      ],
+    );
+  }
+
+  Widget _buildMovieSection(
+      {required String title, required List<MoviesModels> movies}) {
+    return buildMovieSection(title: title, movies: movies);
+  }
+
+  List<MoviesModels> _getMoviesList(List<dynamic>? movies) {
+    return (movies as List<dynamic>)
+        .map((movie) => MoviesModels.fromJson(movie))
+        .toList();
   }
 }

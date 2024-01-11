@@ -1,8 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/google_auth_sign_in.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/service/google/firestore/firestore_service.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/service/google/googleSingIn/google_auth_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/store/movie_card_store.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/components/dialog_error.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/movie_detailed_page.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
@@ -18,8 +20,7 @@ class MovieCard extends StatefulWidget {
 }
 
 class _MovieCardState extends State<MovieCard> {
-  bool isFavorited = false;
-  bool isUserAuthenticated = false;
+  final MovieCardState _state = MovieCardState();
 
   @override
   void initState() {
@@ -28,17 +29,14 @@ class _MovieCardState extends State<MovieCard> {
   }
 
   Future<void> checkIfFavorited() async {
-    SignInScreen signInScreen = SignInScreen();
-    Map<String, dynamic>? userData =
-        await signInScreen.addOrUpdateUserInFirestore();
+    final firestoreService = FirestoreService(Modular.get());
+    final updatedUserData = await firestoreService.addOrUpdateUserInFirestore();
 
-    if (userData != null) {
-      List<dynamic> favoriteMovies = userData['favorite_movies'] ?? [];
-      setState(() {
-        isFavorited =
-            favoriteMovies.any((movie) => movie['id'] == widget.movie.id);
-        isUserAuthenticated = true;
-      });
+    if (updatedUserData != null) {
+      List<dynamic> favoriteMovies = updatedUserData['favorite_movies'] ?? [];
+      _state.isUserAuthenticated = true;
+      _state.isFavorited =
+          favoriteMovies.any((movie) => movie['id'] == widget.movie.id);
     }
   }
 
@@ -91,22 +89,24 @@ class _MovieCardState extends State<MovieCard> {
                     right: 5,
                     child: GestureDetector(
                       onTap: () {
-                        if (isUserAuthenticated) {
-                          setState(() {
-                            isFavorited = !isFavorited;
-                          });
+                        if (_state.isUserAuthenticated) {
+                          _state.toggleFavorite();
                           _saveToFavorites(widget.movie);
                         } else {
                           showLoginPrompt(context);
-                          // Exibir algum aviso ou navegar para a tela de login
-                          // ou realizar ação apropriada quando o usuário não estiver autenticado
                         }
                       },
-                      child: Icon(
-                        isFavorited ? Icons.star : Icons.star_border,
-                        color: isFavorited
-                            ? Colors.amberAccent
-                            : (isUserAuthenticated ? null : Colors.grey),
+                      child: Observer(
+                        builder: (_) {
+                          return Icon(
+                            _state.isFavorited ? Icons.star : Icons.star_border,
+                            color: _state.isFavorited
+                                ? Colors.amberAccent
+                                : (_state.isUserAuthenticated
+                                    ? null
+                                    : Colors.grey),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -143,11 +143,11 @@ class _MovieCardState extends State<MovieCard> {
   }
 
   void _saveToFavorites(MoviesModels movie) {
-    SignInScreen signInScreen = SignInScreen();
+    final firestoreService = FirestoreService(Modular.get());
 
-    isFavorited
-        ? signInScreen.addFavoriteMovies([widget.movie])
-        : signInScreen.removeFavoriteMovie(movie);
+    _state.isFavorited
+        ? firestoreService.addFavoriteMovies([widget.movie])
+        : firestoreService.removeFavoriteMovie(movie);
 
     print('Filme ${movie.title} foi adicionado/removido dos favoritos!');
   }

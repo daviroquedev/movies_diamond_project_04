@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
         elevation: 1,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/diamond_background.png'),
             fit: BoxFit.cover,
@@ -29,7 +29,7 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 180,
               ),
               SizedBox(
@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => Modular.to.navigate('/movies/'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 255, 0, 0),
+                    backgroundColor: const Color.fromARGB(255, 255, 0, 0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

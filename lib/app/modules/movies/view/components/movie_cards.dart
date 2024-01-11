@@ -1,25 +1,53 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/google_auth_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/movie_detailed_page.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:shimmer/shimmer.dart';
 
-class MovieCard extends StatelessWidget {
+class MovieCard extends StatefulWidget {
   final MoviesModels movie;
 
   const MovieCard({Key? key, required this.movie}) : super(key: key);
 
   @override
+  _MovieCardState createState() => _MovieCardState();
+}
+
+class _MovieCardState extends State<MovieCard> {
+  bool isFavorited = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFavorited();
+  }
+
+  Future<void> checkIfFavorited() async {
+    SignInScreen signInScreen = SignInScreen();
+    Map<String, dynamic>? userData =
+        await signInScreen.addOrUpdateUserInFirestore();
+
+    if (userData != null) {
+      List<dynamic> favoriteMovies = userData['favorite_movies'] ?? [];
+      setState(() {
+        isFavorited =
+            favoriteMovies.any((movie) => movie['id'] == widget.movie.id);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final movieDetailsService = Modular.get<MovieDetailsService>();
+
     return GestureDetector(
       onTap: () {
-        final movieDetailsService = Modular.get<MovieDetailsService>();
-        movieDetailsService.setSelectedMovie(movie);
-
-        print('MOVIEE $movie');
-
-        Modular.to.pushNamed('/movies/detailed/${movie.id}', arguments: movie);
+        movieDetailsService.setSelectedMovie(widget.movie);
+        Modular.to.pushNamed('/movies/detailed/${widget.movie.id}',
+            arguments: widget.movie);
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
@@ -43,7 +71,7 @@ class MovieCard extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       color: Colors.black.withOpacity(0.5),
                       child: Text(
-                        movie.title,
+                        widget.movie.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
@@ -52,6 +80,22 @@ class MovieCard extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isFavorited = !isFavorited;
+                        });
+                        _saveToFavorites(widget.movie);
+                      },
+                      child: Icon(
+                        isFavorited ? Icons.star : Icons.star_border,
+                        color: isFavorited ? Colors.amberAccent : null,
                       ),
                     ),
                   ),
@@ -66,7 +110,7 @@ class MovieCard extends StatelessWidget {
 
   Widget _buildMovieImage() {
     return Image.network(
-      'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+      'https://image.tmdb.org/t/p/w500${widget.movie.posterPath}',
       loadingBuilder: (BuildContext context, Widget child,
           ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) {
@@ -85,5 +129,22 @@ class MovieCard extends StatelessWidget {
       fit: BoxFit.cover,
       height: 180,
     );
+  }
+
+  void _saveToFavorites(MoviesModels movie) {
+    SignInScreen signInScreen = SignInScreen();
+    // Implemente aqui a lógica para salvar o filme no Firestore
+    // Por exemplo:
+    // Firestore.instance.collection('favorites').add({
+    //   'title': movie.title,
+    //   'posterPath': movie.posterPath,
+    //   // Outros dados do filme que deseja salvar
+    // });
+
+    isFavorited
+        ? signInScreen.addFavoriteMovies([widget.movie])
+        : signInScreen.removeFavoriteMovie(movie);
+
+    print('Filme ${movie.title} foi adicionado/removido dos favoritos!');
   }
 }

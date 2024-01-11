@@ -15,7 +15,6 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> handleSignIn() async {
     final GoogleSignInAccount? googleUser = await signInWithGoogle();
-    final MoviesModels movie;
 
     if (googleUser != null) {
       setUserDetails(googleUser);
@@ -27,8 +26,6 @@ class SignInScreen extends StatelessWidget {
         print('REQUEST TOKEN $requestToken');
 
         await addOrUpdateUserInFirestore(); // Chamada para verificar/atualizar usuário
-
-        // Restante do seu código...
 
         Modular.to.pushNamed('/movies/');
       } catch (e) {
@@ -137,7 +134,7 @@ class SignInScreen extends StatelessWidget {
 
       print('Favorite movies added to user.');
     } else {
-      print('User not found.'); // Trate esse caso de acordo com o seu fluxo
+      print('User not found.');
     }
   }
 
@@ -160,9 +157,8 @@ class SignInScreen extends StatelessWidget {
           currentFavorites.cast<Map<String, dynamic>>().toList();
 
       // Encontra e remove o filme específico da lista
-      currentFavoritesJson.removeWhere((favoriteMovie) =>
-          favoriteMovie['id'] ==
-          movie.id); // Assumindo que 'id' é um identificador único
+      currentFavoritesJson
+          .removeWhere((favoriteMovie) => favoriteMovie['id'] == movie.id);
 
       await existingUser.reference.update({
         "favorite_movies": currentFavoritesJson,
@@ -170,7 +166,7 @@ class SignInScreen extends StatelessWidget {
 
       print('Favorite movie removed from user.');
     } else {
-      print('User not found.'); // Trate esse caso de acordo com o seu fluxo
+      print('User not found.');
     }
   }
 

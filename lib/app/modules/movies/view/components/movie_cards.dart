@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/service/googleAuth/google_auth_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/service/movie_detailed_service.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/view/components/dialog_error.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/view/screen/movie_detailed_page.dart';
 import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 import 'package:shimmer/shimmer.dart';
@@ -18,6 +19,7 @@ class MovieCard extends StatefulWidget {
 
 class _MovieCardState extends State<MovieCard> {
   bool isFavorited = false;
+  bool isUserAuthenticated = false;
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _MovieCardState extends State<MovieCard> {
       setState(() {
         isFavorited =
             favoriteMovies.any((movie) => movie['id'] == widget.movie.id);
+        isUserAuthenticated = true;
       });
     }
   }
@@ -88,14 +91,22 @@ class _MovieCardState extends State<MovieCard> {
                     right: 5,
                     child: GestureDetector(
                       onTap: () {
-                        setState(() {
-                          isFavorited = !isFavorited;
-                        });
-                        _saveToFavorites(widget.movie);
+                        if (isUserAuthenticated) {
+                          setState(() {
+                            isFavorited = !isFavorited;
+                          });
+                          _saveToFavorites(widget.movie);
+                        } else {
+                          showLoginPrompt(context);
+                          // Exibir algum aviso ou navegar para a tela de login
+                          // ou realizar ação apropriada quando o usuário não estiver autenticado
+                        }
                       },
                       child: Icon(
                         isFavorited ? Icons.star : Icons.star_border,
-                        color: isFavorited ? Colors.amberAccent : null,
+                        color: isFavorited
+                            ? Colors.amberAccent
+                            : (isUserAuthenticated ? null : Colors.grey),
                       ),
                     ),
                   ),
@@ -133,13 +144,6 @@ class _MovieCardState extends State<MovieCard> {
 
   void _saveToFavorites(MoviesModels movie) {
     SignInScreen signInScreen = SignInScreen();
-    // Implemente aqui a lógica para salvar o filme no Firestore
-    // Por exemplo:
-    // Firestore.instance.collection('favorites').add({
-    //   'title': movie.title,
-    //   'posterPath': movie.posterPath,
-    //   // Outros dados do filme que deseja salvar
-    // });
 
     isFavorited
         ? signInScreen.addFavoriteMovies([widget.movie])

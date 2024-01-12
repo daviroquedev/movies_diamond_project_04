@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/service/moviedbService/moviedb_auth_service.dart';
 import 'package:movies_diamond_project_03/app/modules/auth/store/auth_google_store.dart';
+import 'package:movies_diamond_project_03/app/modules/movies/models/movies_models.dart';
 
 class SignInScreen extends StatelessWidget {
   final UserStore userStore = Modular.get();
@@ -24,25 +25,14 @@ class SignInScreen extends StatelessWidget {
 
         print('REQUEST TOKEN $requestToken');
 
-        await addRequestTokenToUserInFirestore(requestToken);
+        await addOrUpdateUserInFirestore(); // Chamada para verificar/atualizar usuário
 
-        // print('TENTANDO ABRIR A URL');
-
-        // try {
-        //   await authApi.requestUserPermission(requestToken);
-        //   print('era pra ta aberta');
-        // } catch (e) {
-        //   print(e);
-        // }
-
-        print('era pra ta aberta');
+        Modular.to.pushNamed('/movies/');
       } catch (e) {
         print('Error adding user/session: $e');
       }
 
       printUserDetails();
-
-      Modular.to.pushNamed('/movies/');
     }
   }
 
@@ -81,6 +71,103 @@ class SignInScreen extends StatelessWidget {
     print('Name: ${userStore.userName}');
     print('Email: ${userStore.userEmail}');
     print('PhotoUrl: ${userStore.userPhotoUrl}');
+  }
+
+  Future<Map<String, dynamic>?> addOrUpdateUserInFirestore() async {
+    final db = FirebaseFirestore.instance;
+
+    final userSnapshot = await db
+        .collection("users")
+        .where("email", isEqualTo: userStore.userEmail)
+        .get();
+
+    if (userSnapshot.docs.isNotEmpty) {
+      final existingUser = userSnapshot.docs.first;
+      final userData = existingUser.data() as Map<String, dynamic>;
+
+      await existingUser.reference.update({
+        "name": userStore.userName,
+        "photoUrl": userStore.userPhotoUrl,
+        // Outros detalhes que podem ser atualizados
+      });
+
+      print('User already exists. Details updated.');
+
+      return userData;
+    } else {
+      await db.collection("users").add({
+        "name": userStore.userName,
+        "email": userStore.userEmail,
+        "photoUrl": userStore.userPhotoUrl,
+        // Outros detalhes do novo usuário
+      });
+      print('New user added to Firestore.');
+
+      return null;
+    }
+  }
+
+  Future<void> addFavoriteMovies(List<MoviesModels> favoriteMovies) async {
+    final db = FirebaseFirestore.instance;
+
+    final userSnapshot = await db
+        .collection("users")
+        .where("email", isEqualTo: userStore.userEmail)
+        .get();
+
+    if (userSnapshot.docs.isNotEmpty) {
+      final existingUser = userSnapshot.docs.first;
+      final userData = existingUser.data();
+
+      List<dynamic> currentFavorites = userData['favorite_movies'] ?? [];
+
+      // Converte cada objeto MoviesModels em um mapa (JSON)
+      List<Map<String, dynamic>> favoriteMoviesJson =
+          favoriteMovies.map((movie) => movie.toJson()).toList();
+
+      // Adiciona os novos filmes à lista existente
+      currentFavorites.addAll(favoriteMoviesJson);
+
+      await existingUser.reference.update({
+        "favorite_movies": currentFavorites,
+      });
+
+      print('Favorite movies added to user.');
+    } else {
+      print('User not found.');
+    }
+  }
+
+  Future<void> removeFavoriteMovie(MoviesModels movie) async {
+    final db = FirebaseFirestore.instance;
+
+    final userSnapshot = await db
+        .collection("users")
+        .where("email", isEqualTo: userStore.userEmail)
+        .get();
+
+    if (userSnapshot.docs.isNotEmpty) {
+      final existingUser = userSnapshot.docs.first;
+      final userData = existingUser.data() as Map<String, dynamic>;
+
+      List<dynamic> currentFavorites = userData['favorite_movies'] ?? [];
+
+      // Converte cada objeto MoviesModels em um mapa (JSON)
+      List<Map<String, dynamic>> currentFavoritesJson =
+          currentFavorites.cast<Map<String, dynamic>>().toList();
+
+      // Encontra e remove o filme específico da lista
+      currentFavoritesJson
+          .removeWhere((favoriteMovie) => favoriteMovie['id'] == movie.id);
+
+      await existingUser.reference.update({
+        "favorite_movies": currentFavoritesJson,
+      });
+
+      print('Favorite movie removed from user.');
+    } else {
+      print('User not found.');
+    }
   }
 
   @override

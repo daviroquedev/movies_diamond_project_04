@@ -28,6 +28,7 @@ class MoviesModule extends Module {
 
       return MovieDetailsPage(movie: movie);
     });
+    r.child('/favorites/', child: (context) => MoviesScreen());
     // r.module('/auth/', module: AuthModule());
   }
 }

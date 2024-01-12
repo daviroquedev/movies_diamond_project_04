@@ -62,6 +62,18 @@ class SearchDrawerState extends State<SearchDrawer> {
             decoration: const BoxDecoration(
               color: Colors.black,
             ),
+            otherAccountsPictures: [
+              ListTile(
+                leading: const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onTap: () {
+                  // Navegue para a página de filmes favoritos
+                  Modular.to.pushNamed('/movies/favorites');
+                },
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),

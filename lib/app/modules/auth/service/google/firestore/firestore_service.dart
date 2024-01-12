@@ -73,9 +73,9 @@ class FirestoreService {
         "favorite_movies": currentFavorites,
       });
 
-      print('Favorite movies added to user.');
+      print('Filme favorito add.');
     } else {
-      print('User not found.');
+      print('Usuario não localizado.');
     }
   }
 

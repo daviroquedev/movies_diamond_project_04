@@ -32,13 +32,14 @@ class FirestoreService {
   }
 
   void _updateExistingUser(DocumentSnapshot existingUser) async {
-    await existingUser.reference.update({
-      "name": userStore.userName,
-      "photoUrl": userStore.userPhotoUrl,
-      // alterar info
-    });
-
-    print('User already exists. Details updated.');
+    if (userStore.userName != existingUser['name'] ||
+        userStore.userPhotoUrl != existingUser['photoUrl']) {
+      await existingUser.reference.update({
+        "name": userStore.userName,
+        "photoUrl": userStore.userPhotoUrl,
+      });
+      print('User details updated.');
+    }
   }
 
   void _addNewUser() async {
